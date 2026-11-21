@@ -1,0 +1,483 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#0f1115">
+<title>Calistenia em Casa — Marcus do Vale | 1% todo dia</title>
+<style>
+*{box-sizing:border-box}
+body{margin:0;font-family:system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;background:#0f1115;color:#f2f2f2;line-height:1.55}
+header{padding:22px 16px 16px;background:#1a1d24;border-bottom:3px solid #c9a227}
+h1{margin:0;font-size:24px}
+h2{font-size:20px;margin:18px 0 8px}
+h3{margin:0 0 4px;font-size:17px}
+header p{margin:6px 0 0;color:#cfcfcf}
+.muted{color:#bdbdbd;font-size:14px}
+.gold{color:#e8c84a}
+nav{display:flex;gap:8px;padding:12px 16px;flex-wrap:wrap;background:#14171c;position:sticky;top:0;z-index:5}
+nav button{background:#242832;color:#fff;border:1px solid #444;border-radius:20px;padding:9px 14px;cursor:pointer;font-size:15px}
+nav button.on{background:#c9a227;color:#111;border-color:#c9a227;font-weight:700}
+main{max-width:900px;margin:0 auto;padding:16px 16px 40px}
+.card{background:#1c1f26;border:1px solid #333;border-radius:12px;padding:14px;margin:10px 0}
+.card.done{border-color:#1e7d32;opacity:.85}
+.tag{display:inline-block;background:#c9a227;color:#111;border-radius:20px;padding:2px 10px;font-size:12px;font-weight:700;margin:2px 4px 2px 0}
+.tag.soft{background:#2a2f3a;color:#e8c84a}
+button.big{background:#c9a227;color:#111;border:0;border-radius:10px;padding:13px 18px;font-weight:800;cursor:pointer;font-size:16px;width:100%;margin:8px 0}
+button.sec{background:#242832;color:#fff;border:1px solid #555;border-radius:10px;padding:10px 14px;cursor:pointer;font-size:15px;margin:4px 4px 4px 0}
+button.sec.on{background:#c9a227;color:#111;border-color:#c9a227;font-weight:700}
+button:disabled{opacity:.5;cursor:default}
+input,select{width:100%;padding:12px;border-radius:10px;border:1px solid #444;background:#1c1f26;color:#fff;font-size:16px;margin:6px 0}
+details{background:#1c1f26;border:1px solid #333;border-radius:12px;padding:12px;margin:10px 0}
+summary{cursor:pointer;font-weight:700;font-size:16px}
+.ex{display:flex;gap:10px;align-items:flex-start}
+.ex input[type=checkbox]{width:22px;height:22px;margin-top:4px;flex:none;accent-color:#c9a227}
+.ex .body{flex:1}
+.reps{font-weight:700;color:#e8c84a}
+.bar{height:10px;background:#2a2f3a;border-radius:10px;overflow:hidden;margin:8px 0}
+.bar i{display:block;height:100%;background:#c9a227}
+.timer{font-size:52px;font-weight:800;text-align:center;margin:8px 0;font-variant-numeric:tabular-nums}
+.timer-label{text-align:center;font-size:18px;font-weight:700}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.stat{background:#1c1f26;border:1px solid #333;border-radius:12px;padding:14px;text-align:center}
+.stat b{font-size:26px;display:block;color:#e8c84a}
+.stat span{font-size:13px;color:#bdbdbd}
+table{width:100%;border-collapse:collapse;font-size:15px}
+td,th{padding:9px 6px;border-bottom:1px solid #333;text-align:left;vertical-align:top}
+th{color:#e8c84a}
+.warn{background:#2a2113;border:1px solid #c9a227;border-radius:12px;padding:12px;margin:10px 0}
+video{width:100%;border-radius:10px;background:#000;display:block;margin:8px 0}
+footer{padding:20px 16px;color:#999;font-size:13px;text-align:center}
+a{color:#e8c84a}
+@media(max-width:560px){.grid{grid-template-columns:1fr 1fr}.timer{font-size:44px}}
+</style>
+</head>
+<body>
+<header>
+<h1>Calistenia em Casa</h1>
+<p>Sem aparelhos. Só o peso do corpo — e a corda quando chegar em casa ou no fim de semana.</p>
+<p class="muted">Marcus do Vale • 1% todo dia • Treino curto, 15 a 25 min, cabe depois do trabalho.</p>
+<div id="nivelBox" style="margin-top:10px">
+<span class="muted">Seu nível: </span>
+<button class="sec" id="btnIni" onclick="setNivel('iniciante')">Iniciante</button>
+<button class="sec" id="btnInter" onclick="setNivel('intermediario')">Intermediário</button>
+</div>
+</header>
+<nav>
+<button class="on" data-sec="hoje" onclick="show('hoje',this)">Hoje</button>
+<button data-sec="treinos" onclick="show('treinos',this)">Treinos</button>
+<button data-sec="corda" onclick="show('corda',this)">Corda</button>
+<button data-sec="exercicios" onclick="show('exercicios',this)">Exercícios</button>
+<button data-sec="timer" onclick="show('timer',this)">Cronômetro</button>
+<button data-sec="progresso" onclick="show('progresso',this)">Progresso</button>
+</nav>
+<main>
+
+<section id="hoje">
+<div class="card">
+<h3 id="hojeTitulo">Treino de hoje</h3>
+<p id="hojeDesc" class="muted"></p>
+<div id="hojeAcao"></div>
+<p class="muted" id="hojeData"></p>
+</div>
+<div class="card">
+<h3>A semana — 1% todo dia</h3>
+<table>
+<tr><th>Dia</th><th>Treino</th><th>Tempo</th></tr>
+<tr><td>Segunda</td><td>A — Empurrar + core</td><td>~20 min</td></tr>
+<tr><td>Terça</td><td>B — Pernas + glúteo</td><td>~20 min</td></tr>
+<tr><td>Quarta</td><td>Descanso ou corda leve 10 min</td><td>10 min</td></tr>
+<tr><td>Quinta</td><td>C — Puxar na mesa + costas</td><td>~20 min</td></tr>
+<tr><td>Sexta</td><td>D — Corpo inteiro (circuito)</td><td>~25 min</td></tr>
+<tr><td>Sábado</td><td>Corda 20 min + circuito curto</td><td>20 min</td></tr>
+<tr><td>Domingo</td><td>E — Mobilidade e alongamento</td><td>10 min</td></tr>
+</table>
+<p class="muted">Perdeu um dia? Não tenta compensar dobrando no outro. Faz o treino do dia e segue. Constância ganha de intensidade.</p>
+</div>
+<div class="warn"><b>Antes de começar:</b> aquece 2 min (marcha no lugar + polichinelo leve + rotação de ombro). Dor aguda, pontada ou tontura = para na hora. Se tiver lesão, dor no joelho, ombro ou coluna, fala com um médico ou profissional antes de treinar.</div>
+</section>
+
+<section id="treinos" style="display:none">
+<h2>Treinos — sem aparelhos</h2>
+<p class="muted">Toca no treino para abrir. Marca cada exercício quando terminar. O descanso entre séries é 60 s (90 s nas pernas).</p>
+<div id="listaTreinos"></div>
+<div id="treinoAberto"></div>
+</section>
+
+<section id="corda" style="display:none">
+<h2>Corda — quando chegar em casa ou no fim de semana</h2>
+<p class="muted">Corda é cardio e coordenação. Começa baixo, joelho mole, pulo curto — só o suficiente para a corda passar. Não precisa pular alto.</p>
+<div class="warn"><b>Como ajustar a corda:</b> pisa no meio dela com um pé. As manoplas têm que chegar na altura do peito / axila. Corda longa demais enrosca, curta demais te faz pular alto e cansar.</div>
+<div id="listaCorda"></div>
+<div id="cordaAberta"></div>
+<h2>Sem corda ainda?</h2>
+<div class="card"><p>Faz o mesmo treino com <b>pulo imaginário</b>: gira os pulsos como se segurasse a corda e pula igual, ou troca por polichinelo. O condicionamento é quase o mesmo — só perde a coordenação da corda.</p></div>
+<h2>Técnica em 5 pontos</h2>
+<div class="card">
+<p>1. Cotovelo junto do corpo, o giro sai do <b>pulso</b>, não do braço inteiro.<br>
+2. Pula na ponta do pé, joelho levemente dobrado, 2 a 3 cm do chão.<br>
+3. Olha para frente, não para o pé.<br>
+4. Respira pelo nariz no ritmo. Perdeu o ritmo? Para, respira, recomeça — não tenta salvar no desespero.<br>
+5. Tênis com amortecimento e um espaço livre (cuidado com teto baixo, ventilador e móvel perto).</p>
+</div>
+</section>
+
+<section id="exercicios" style="display:none">
+<h2>Biblioteca de exercícios</h2>
+<input id="q" placeholder="Busque: flexão, agachamento, prancha..." oninput="filtrarEx()">
+<select id="filtroMusculo" onchange="filtrarEx()">
+<option value="">Todos os músculos</option>
+<option>Peito</option><option>Ombro</option><option>Tríceps</option>
+<option>Costas</option><option>Perna</option><option>Glúteo</option>
+<option>Core</option><option>Cardio</option>
+</select>
+<div id="listaEx"></div>
+</section>
+
+
+<section id="timer" style="display:none">
+<h2>Cronômetro — exercício e descanso</h2>
+<p class="muted">Usa no treino: marca o tempo do exercício e o descanso, sem precisar olhar o relógio do celular.</p>
+<div class="card">
+<div class="timer-label" id="cronFase">Pronto?</div>
+<div class="timer" id="cronShow">00:30</div>
+<p class="muted" style="text-align:center" id="cronVolta">Volta 0 de 4</p>
+<p>Tempo do exercício: <select id="cronEx"><option value="20">20 s</option><option value="30" selected>30 s</option><option value="45">45 s</option><option value="60">60 s</option></select></p>
+<p>Tempo do descanso: <select id="cronDesc"><option value="30">30 s</option><option value="60" selected>60 s</option><option value="90">90 s</option></select></p>
+<p>Voltas (exercício + descanso): <select id="cronVoltas"><option value="3">3</option><option value="4" selected>4</option><option value="5">5</option><option value="6">6</option></select></p>
+<button class="big" onclick="cronIniciar()">Começar — exercício + descanso</button>
+<button class="sec" onclick="cronPausar()">Pausar</button>
+<button class="sec" onclick="cronParar()">Zerar</button>
+</div>
+<div class="card">
+<h3>Rápido — só um tempo</h3>
+<button class="sec" onclick="cronUnico(30,'Exercício 30 s')">Exercício 30 s</button>
+<button class="sec" onclick="cronUnico(45,'Exercício 45 s')">Exercício 45 s</button>
+<button class="sec" onclick="cronUnico(60,'Exercício 60 s')">Exercício 60 s</button>
+<button class="sec" onclick="cronUnico(60,'Descanso 60 s')">Descanso 60 s</button>
+<button class="sec" onclick="cronUnico(90,'Descanso 90 s')">Descanso 90 s</button>
+</div>
+<p class="muted">O cronômetro apita quando troca de exercício para descanso e quando termina. Deixa o som do celular ligado.</p>
+</section>
+
+<section id="progresso" style="display:none">
+<h2>Progresso — 1% todo dia</h2>
+<div class="grid">
+<div class="stat"><b id="stTotal">0</b><span>treinos feitos</span></div>
+<div class="stat"><b id="stSemana">0</b><span>esta semana</span></div>
+<div class="stat"><b id="stMin">0</b><span>minutos somados</span></div>
+<div class="stat"><b id="stSeq">0</b><span>semanas com 3+ treinos</span></div>
+</div>
+<p class="muted">Meta da semana: <b class="gold">3 treinos</b>. Não é meta de perfeição — é o mínimo que mantém o ritmo.</p>
+<div class="bar"><i id="barSemana" style="width:0%"></i></div>
+<p class="muted" id="metaTexto"></p>
+<h3>Últimos treinos</h3>
+<div id="historico"></div>
+<button class="sec" onclick="limparHistorico()">Apagar histórico</button>
+<h3>Como evoluir (regra simples)</h3>
+<div class="card"><p>Quando conseguir fazer <b>todas as séries no topo da faixa</b> (ex.: 3x12 flexão) com boa forma em 2 treinos seguidos, sobe um degrau: mais 2 repetições por série, ou passa para a versão mais difícil do exercício. Não sobe peso nem repetição e forma ao mesmo tempo.</p>
+<p class="muted">Exemplo: flexão de joelhos 3x12 fácil → flexão normal 3x6 → 3x8 → 3x10 → 3x12 → flexão com pausa de 2 s embaixo.</p></div>
+</section>
+
+</main>
+<footer>Calistenia em Casa • Marcus do Vale • Feito para usar no celular, em casa, sem aparelhos.<br>Conteúdo educativo, não substitui orientação de profissional de educação física ou médico.</footer>
+
+<script>
+// ---------- DADOS ----------
+const EX = {
+flexao_joelho:{nome:"Flexão de joelhos",musculo:"Peito",video:"videos/flexao-joelhos.mp4",como:"Mãos no chão na largura dos ombros, joelhos no chão, corpo reto do joelho à cabeça. Desce o peito até quase tocar o chão e empurra de volta.",erro:"Quadril caindo ou subindo. Se o corpo quebra no meio, para a série.",facil:"Mãos numa cadeira firme (flexão inclinada).",dificil:"Flexão normal, no pé."},
+flexao:{nome:"Flexão (normal)",musculo:"Peito",video:"videos/flexao.mp4",como:"Mãos no chão, corpo reto da cabeça ao calcanhar. Desce controlado, peito perto do chão, empurra o chão para longe.",erro:"Cotovelo abrindo muito para o lado ou quadril caindo.",facil:"Flexão de joelhos.",dificil:"Pausa de 2 s embaixo, ou pés num degrau baixo."},
+flexao_inclinada:{nome:"Flexão inclinada (mãos na cadeira)",musculo:"Peito",video:"videos/flexao-inclinada.mp4",como:"Mãos numa cadeira ou mesa firme, corpo reto. Desce o peito em direção à cadeira.",erro:"Cadeira escorregando — testa antes, encosta na parede.",facil:"Mãos mais altas (mesa).",dificil:"Mãos no chão."},
+flexao_diamante:{nome:"Flexão diamante (joelhos)",musculo:"Tríceps",video:"videos/flexao-diamante.mp4",como:"Mãos juntas no chão, polegares e indicadores formando um triângulo. Cotovelos junto do corpo na descida.",erro:"Quadril alto demais vira outro exercício. Mantém o corpo reto.",facil:"Mãos afastadas (flexão normal de joelhos).",dificil:"Flexão diamante no pé."},
+mergulho_cadeira:{nome:"Mergulho na cadeira (tríceps)",musculo:"Tríceps",video:"videos/mergulho-cadeira.mp4",como:"Mãos na beira de uma cadeira firme, pernas estendidas ou dobradas. Desce o corpo dobrando o cotovelo até ~90°, empurra de volta.",erro:"Ombro subindo para a orelha ou cadeira instável.",facil:"Joelhos dobrados, pés perto.",dificil:"Pernas estendidas, pés longe."},
+agachamento:{nome:"Agachamento livre",musculo:"Perna",video:"videos/agachamento.mp4",como:"Pés na largura dos ombros, peito aberto. Senta o quadril para trás e para baixo, joelhos seguindo a ponta do pé. Volta empurrando o chão.",erro:"Joelho entrando para dentro ou calcanhar levantando.",facil:"Agacha até a cadeira e levanta (agachamento na cadeira).",dificil:"Agachamento com pausa de 3 s embaixo."},
+afundo:{nome:"Afundo (passada no lugar)",musculo:"Perna",video:"videos/afundo.mp4",como:"Um pé na frente, outro atrás. Desce o joelho de trás em direção ao chão, tronco reto. Troca a perna na próxima série.",erro:"Joelho da frente passando muito da ponta do pé ou tronco inclinando.",facil:"Segura numa parede/cadeira para equilibrar.",dificil:"Afundo búlgaro (pé de trás na cadeira)."},
+bulgaro:{nome:"Agachamento búlgaro",musculo:"Perna",video:"videos/bulgaro.mp4",como:"Pé de trás apoiado numa cadeira baixa, pé da frente a um passo. Desce reto, joelho da frente alinhado.",erro:"Pé da frente muito perto da cadeira — afasta um passo inteiro.",facil:"Afundo normal.",dificil:"Pausa de 2 s embaixo."},
+ponte:{nome:"Ponte de glúteo",musculo:"Glúteo",video:"videos/ponte-gluteo.mp4",como:"Deitado, joelhos dobrados, pés no chão. Empurra o chão com o calcanhar e sobe o quadril até o corpo ficar reto. Aperta o glúteo 1 s em cima.",erro:"Lombar arqueando em cima — o limite é o corpo reto, não mais alto.",facil:"Ponte com os dois pés.",dificil:"Ponte com uma perna só."},
+panturrilha:{nome:"Panturrilha em pé",musculo:"Perna",video:"videos/panturrilha.mp4",como:"Em pé, sobe na ponta do pé devagar, segura 1 s em cima, desce controlado.",erro:"Fazer rápido no impulso. Devagar conta mais.",facil:"Com as duas pernas, segurando na parede.",dificil:"Uma perna só."},
+remada_mesa:{nome:"Remada na mesa (australiana)",musculo:"Costas",video:"videos/remada-mesa.mp4",como:"Deitado embaixo de uma mesa firme, segura a borda com as duas mãos, corpo reto, calcanhares no chão. Puxa o peito até a mesa.",erro:"Mesa instável ou leve — testa com o peso antes, mesa pesada e firme, sem rodinha.",facil:"Joelhos dobrados, pés perto do corpo.",dificil:"Pernas estendidas, corpo mais horizontal."},
+superman:{nome:"Superman (lombar)",musculo:"Costas",video:"videos/superman.mp4",como:"Deitado de barriga para baixo, braços estendidos à frente. Levanta peito e pernas juntos, segura 2 s, desce devagar.",erro:"Levantar com tranco no pescoço. Olha para o chão, não para frente.",facil:"Levanta só o peito, pernas no chão.",dificil:"Segura 3 s em cima."},
+prancha:{nome:"Prancha",musculo:"Core",video:"videos/prancha.mp4",como:"Antebraços no chão, cotovelos embaixo do ombro, corpo reto da cabeça ao calcanhar. Respira normal, sem segurar o ar.",erro:"Quadril caindo ou bumbum lá em cima.",facil:"Joelhos no chão.",dificil:"Prancha com um pé levantado, alternando."},
+prancha_lateral:{nome:"Prancha lateral",musculo:"Core",video:"videos/prancha-lateral.mp4",como:"De lado, antebraço no chão, corpo reto. Segura o tempo, troca o lado.",erro:"Quadril caindo para o chão.",facil:"Joelho de baixo no chão.",dificil:"Braço de cima estendido para o teto."},
+abdominal:{nome:"Abdominal curto",musculo:"Core",video:"videos/abdominal.mp4",como:"Deitado, joelhos dobrados. Levanta só os ombros do chão, olhando para cima, expira subindo.",erro:"Puxar o pescoço com as mãos. Mão só apoia, não puxa.",facil:"Braços estendidos para frente.",dificil:"Abdominal com pernas elevadas a 90°."},
+perna_alta:{nome:"Elevação de pernas",musculo:"Core",video:"videos/perna-alta.mp4",como:"Deitado, mãos embaixo do quadril. Sobe as pernas retas até 90° e desce devagar sem tocar o chão.",erro:"Lombar saindo do chão na descida — desce só até onde a lombar fica colada.",facil:"Joelhos dobrados.",dificil:"Pernas retas, descida em 3 s."},
+mountain:{nome:"Mountain climber",musculo:"Cardio",video:"videos/mountain.mp4",como:"Posição de flexão. Traz um joelho ao peito, troca rápido, quadril estável.",erro:"Quadril balançando para cima e para baixo. O tronco fica parado, só a perna move.",facil:"Devagar, um joelho de cada vez.",dificil:"Ritmo mais rápido por 20 s."},
+polichinelo:{nome:"Polichinelo",musculo:"Cardio",video:"videos/polichinelo.mp4",como:"Pula abrindo pernas e braços, volta fechando. Ritmo constante.",erro:"Aterrissar com o joelho duro — joelho mole, na ponta do pé.",facil:"Sem pulo: abre a perna de lado e levanta o braço (passo lateral).",dificil:"Polichinelo com agachamento ao fechar."},
+burpee_sem_salto:{nome:"Burpee sem salto",musculo:"Cardio",video:"videos/burpee.mp4",como:"Agacha, mãos no chão, pula os pés para trás (prancha), volta os pés, levanta. Sem salto no final.",erro:"Fazer no desespero e perder a forma. Devagar e certo.",facil:"Sem o pulo dos pés para trás: vai um pé de cada vez.",dificil:"Com flexão no meio."},
+ombro_parede:{nome:"Flexão de ombro (pike)",musculo:"Ombro",video:"videos/ombro-pike.mp4",como:"Mãos no chão, quadril alto, corpo em V invertido. Desce a cabeça em direção ao chão, empurra de volta.",erro:"Cotovelo abrindo demais. Cotovelo aponta para trás.",facil:"Quadril menos alto.",dificil:"Pés num degrau baixo."},
+alongamento:{nome:"Alongamento geral",musculo:"Core",video:"videos/alongamento.mp4",como:"Segura cada posição 30 s, respirando fundo. Pescoço, ombro, peito na porta, quadril, posterior e panturrilha.",erro:"Puxar até doer. Alongar é desconforto leve, não dor.",facil:"—",dificil:"—"}
+};
+
+
+// Forma 2 de cada exercício: sempre uma alternativa real.
+// Mesa de vidro NÃO serve para remada: usa a Forma 2, remada com mochila.
+const ALT = {
+flexao_joelho:{nome:"Forma 2 — Flexão na parede (sem chão)",como:"Mãos na parede na altura do ombro, pés atrás, corpo reto. Desce o peito até a parede. É a forma mais leve — boa para começar ou para o dia cansado.",video:"videos/flexao-parede.mp4"},
+flexao:{nome:"Forma 2 — Flexão de joelhos",como:"Joelhos no chão, corpo reto do joelho à cabeça. Mesmo movimento da flexão, com menos peso. Usa quando não aguentar mais a forma normal.",video:"videos/flexao-joelhos.mp4"},
+flexao_inclinada:{nome:"Forma 2 — Flexão na parede (sem cadeira nem mesa)",como:"Mãos na parede, pés atrás, corpo reto. Não precisa de cadeira nenhuma — só uma parede livre.",video:"videos/flexao-parede.mp4"},
+flexao_diamante:{nome:"Forma 2 — Flexão normal de joelhos",como:"Mãos afastadas, de joelhos. Trabalha peito e tríceps juntos, sem forçar tanto o cotovelo.",video:"videos/flexao-joelhos.mp4"},
+mergulho_cadeira:{nome:"Forma 2 — Flexão diamante de joelhos (sem cadeira)",como:"Mãos juntas no chão, de joelhos, cotovelos junto do corpo. Faz o tríceps sem precisar de cadeira.",video:"videos/flexao-joelhos.mp4"},
+agachamento:{nome:"Forma 2 — Agachamento na cadeira",como:"Em pé na frente de uma cadeira firme, senta o quadril até encostar leve no assento e levanta. A cadeira marca até onde descer.",video:"videos/agachamento-cadeira.mp4"},
+afundo:{nome:"Forma 2 — Afundo segurando na parede",como:"Uma mão na parede para equilibrar, mesma passada. Boa se o equilíbrio falhar no afundo livre.",video:"videos/afundo.mp4"},
+bulgaro:{nome:"Forma 2 — Afundo normal (sem cadeira)",como:"Passada no lugar, sem apoiar o pé atrás em nada. Menos difícil que o búlgaro e não precisa de cadeira.",video:"videos/afundo.mp4"},
+ponte:{nome:"Forma 2 — Ponte com uma perna só",como:"Uma perna estendida para cima, sobe o quadril com a outra. Só faz se a ponte normal com 2 pernas já estiver fácil.",video:"videos/ponte-gluteo.mp4"},
+panturrilha:{nome:"Forma 2 — Panturrilha segurando na parede",como:"Uma mão na parede, sobe na ponta do pé devagar. Sem parede, faz com as duas mãos na cintura.",video:"videos/panturrilha.mp4"},
+remada_mesa:{nome:"Forma 2 — Remada com mochila (SEM mesa — para mesa de vidro)",como:"Mochila com livros ou garrafas dentro. Uma mão e um joelho apoiados numa cadeira firme, costas retas, puxa a mochila até a costela. Mesa de vidro NÃO serve para remada: ela pode quebrar e te machucar. Usa sempre esta forma se a tua mesa for de vidro.",video:"videos/remada-mochila.mp4"},
+superman:{nome:"Forma 2 — Superman só com o peito",como:"Levanta só o peito, pernas no chão. Menos carga na lombar.",video:"videos/superman.mp4"},
+prancha:{nome:"Forma 2 — Prancha de joelhos",como:"Joelhos no chão, corpo reto do joelho à cabeça. Mesma prancha, com menos peso.",video:"videos/prancha.mp4"},
+prancha_lateral:{nome:"Forma 2 — Prancha lateral com o joelho no chão",como:"Joelho de baixo no chão, corpo reto. Segura o tempo e troca o lado.",video:"videos/prancha-lateral.mp4"},
+abdominal:{nome:"Forma 2 — Abdominal com os braços estendidos",como:"Braços estendidos para frente, levanta só os ombros. Não puxa o pescoço.",video:"videos/abdominal.mp4"},
+perna_alta:{nome:"Forma 2 — Elevação com os joelhos dobrados",como:"Joelhos dobrados a 90°, sobe e desce devagar sem tocar o chão.",video:"videos/perna-alta.mp4"},
+mountain:{nome:"Forma 2 — Mountain climber devagar",como:"Um joelho de cada vez, devagar, quadril parado. O cardio é menor, a forma é a mesma.",video:"videos/mountain.mp4"},
+polichinelo:{nome:"Forma 2 — Polichinelo sem pulo",como:"Abre a perna de lado e levanta o braço, sem pular. Para joelho sensível ou vizinho embaixo.",video:"videos/polichinelo.mp4"},
+burpee_sem_salto:{nome:"Forma 2 — Burpee um pé de cada vez",como:"Vai um pé de cada vez para trás e para frente, sem pular os dois juntos.",video:"videos/burpee.mp4"},
+ombro_parede:{nome:"Forma 2 — Flexão de ombro com o quadril mais baixo",como:"Quadril menos alto, menos peso no ombro. Mesma descida da cabeça.",video:"videos/ombro-pike.mp4"},
+alongamento:{nome:"Forma 2 — Alongamento sentado",como:"Sentado na cadeira, alonga pescoço, ombro e posterior de uma perna de cada vez, 30 s cada.",video:"videos/alongamento.mp4"}
+};
+
+const TREINOS = {
+A:{nome:"A — Empurrar + core",tempo:"~20 min",desc:"Peito, ombro e tríceps. O treino de segunda.",ex:[
+["flexao_joelho","3 séries",[8,12]],["flexao_inclinada","3 séries",[10,15]],["flexao_diamante","3 séries",[6,10]],["mergulho_cadeira","3 séries",[8,12]],["ombro_parede","2 séries",[6,10]],["prancha","3 x tempo",[30,45]]]},
+B:{nome:"B — Pernas + glúteo",tempo:"~20 min",desc:"Perna e glúteo, sem peso. Descanso de 90 s entre séries.",ex:[
+["agachamento","3 séries",[12,15]],["afundo","3 séries p/ perna",[8,10]],["bulgaro","2 séries p/ perna",[6,8]],["ponte","3 séries",[12,15]],["panturrilha","3 séries",[12,15]],["prancha_lateral","2 x tempo p/ lado",[20,30]]]},
+C:{nome:"C — Puxar na mesa + costas",tempo:"~20 min",desc:"Costas usando mesa firme. Testa a mesa antes: pesada, sem rodinha, não escorrega. Mesa de vidro NÃO serve — usa a Forma 2, remada com mochila.",ex:[
+["remada_mesa","4 séries",[6,10]],["superman","3 séries",[10,12]],["flexao_joelho","3 séries",[8,12]],["prancha","3 x tempo",[30,45]],["perna_alta","3 séries",[8,12]]]},
+D:{nome:"D — Corpo inteiro (circuito)",tempo:"~25 min",desc:"Circuito: faz os 6 em sequência, descansa 2 min, repete 3 vezes.",ex:[
+["polichinelo","3 voltas x tempo",[30,30]],["flexao_joelho","3 voltas",[8,12]],["agachamento","3 voltas",[12,15]],["mountain","3 voltas x tempo",[20,30]],["ponte","3 voltas",[12,15]],["burpee_sem_salto","3 voltas",[6,8]]]},
+E:{nome:"E — Mobilidade e alongamento",tempo:"10 min",desc:"Domingo ou dia de descanso ativo. Devagar, respirando.",ex:[
+["alongamento","1 x tempo (cada posição)",[30,30]],["prancha","2 x tempo",[20,30]],["agachamento","2 séries leves",[8,10]],["superman","2 séries",[8,10]]]}
+};
+
+const CORDA = {
+leve:{nome:"Corda leve — 10 min",quando:"Quando chegar em casa, dia de semana",tempo:"10 min",desc:"Para aprender o ritmo sem se matar. Ideal para quarta ou qualquer dia cansado.",passos:[
+["Aquecimento sem corda",120,"Marcha no lugar + rotação de ombro"],["Pulo básico",30,"Ritmo leve, corda passando rente"],["Descanso / respiração",30,"Caminha, respira"],["Pulo básico",30,"Tenta não parar no meio"],["Descanso",30,""],["Pulo básico",45,"Um pouco mais longo"],["Descanso",30,""],["Pulo alternado (um pé de cada vez)",30,"Como marchar no lugar, com a corda"],["Descanso",30,""],["Pulo básico final",60,"No seu ritmo, sem pressa"],["Alongamento leve",60,"Panturrilha e ombro"]]},
+medio:{nome:"Corda ritmo — 15 min",quando:"Quando chegar em casa com energia, ou sábado",tempo:"15 min",desc:"Intervalos de 45 s pulando e 30 s descansando. Ritmo constante.",passos:[
+["Aquecimento sem corda",120,"Polichinelo leve + marcha"],["Pulo básico",45,""],["Descanso",30,""],["Pulo básico",45,""],["Descanso",30,""],["Pulo alternado",45,""],["Descanso",30,""],["Pulo básico",60,""],["Descanso",30,""],["Pulo alternado",45,""],["Descanso",30,""],["Pulo básico",60,"O mais longo do treino"],["Descanso",30,""],["Pulo livre final",60,"No ritmo que conseguir"],["Alongamento",60,""]]},
+longo:{nome:"Corda fim de semana — 20 min",quando:"Sábado ou domingo de manhã",tempo:"20 min",desc:"O treino de corda completo, com circuito curto no meio.",passos:[
+["Aquecimento sem corda",120,""],["Pulo básico",60,""],["Descanso",30,""],["Pulo alternado",60,""],["Descanso",30,""],["Agachamento (sem corda)",30,"12 a 15 repetições"],["Pulo básico",60,""],["Descanso",30,""],["Mountain climber (sem corda)",30,"20 s"],["Pulo alternado",60,""],["Descanso",30,""],["Flexão de joelhos (sem corda)",30,"8 a 12"],["Pulo básico",60,""],["Descanso",30,""],["Pulo livre final",90,""],["Alongamento",90,""]]}
+};
+
+// ---------- ESTADO ----------
+const KEY="calistenia_mv_v1";
+let state={nivel:"iniciante",hist:[]};
+try{const s=JSON.parse(localStorage.getItem(KEY)); if(s) state=s;}catch(e){}
+function save(){localStorage.setItem(KEY,JSON.stringify(state));}
+function setNivel(n){state.nivel=n; save(); pintarNivel(); renderTreinos(); renderHoje();}
+function pintarNivel(){
+document.getElementById("btnIni").classList.toggle("on",state.nivel==="iniciante");
+document.getElementById("btnInter").classList.toggle("on",state.nivel==="intermediario");
+}
+function repsTxt(r){return state.nivel==="iniciante" ? r[0] : r[1];}
+function fmt(s){s=Math.max(0,Math.round(s));return String(Math.floor(s/60)).padStart(2,"0")+":"+String(s%60).padStart(2,"0");}
+function beep(){try{const c=new (window.AudioContext||window.webkitAudioContext)();const o=c.createOscillator();o.frequency.value=880;o.connect(c.destination);o.start();o.stop(c.currentTime+0.25);}catch(e){}}
+
+function videoHTML(x,id){
+let h='<p class="muted"><b>Forma 1 — padrão</b></p>';
+if(x.video) h+='<video controls loop muted playsinline preload="metadata" src="'+x.video+'"></video><p class="muted">Vídeo curto — execução correta. Toca para assistir, em loop.</p>';
+else h+='<p class="muted">Vídeo curto da Forma 1 em breve — próxima leva.</p>';
+const a=ALT[id];
+if(a){
+h+='<p class="muted"><b>'+a.nome+'</b><br>'+a.como+'</p>';
+if(a.video) h+='<video controls loop muted playsinline preload="metadata" src="'+a.video+'"></video><p class="muted">Vídeo curto — execução correta da Forma 2.</p>';
+else h+='<p class="muted">Vídeo curto da Forma 2 em breve — próxima leva.</p>';
+}
+return h;
+}
+// ---------- NAVEGAÇÃO ----------
+function show(id,btn){
+document.querySelectorAll("main > section").forEach(s=>s.style.display="none");
+document.getElementById(id).style.display="block";
+document.querySelectorAll("nav button").forEach(b=>b.classList.remove("on"));
+if(btn) btn.classList.add("on");
+if(id==="progresso") renderProgresso();
+window.scrollTo({top:0});
+}
+
+// ---------- HOJE ----------
+const HOJE_MAP={0:["E","Domingo — descanso ativo"],1:["A","Segunda — Empurrar"],2:["B","Terça — Pernas"],3:[null,"Quarta — descanso ou corda leve"],4:["C","Quinta — Puxar"],5:["D","Sexta — Corpo inteiro"],6:[null,"Sábado — corda 20 min"]};
+function renderHoje(){
+const d=new Date(); const [id,label]=HOJE_MAP[d.getDay()];
+document.getElementById("hojeData").textContent="Hoje é "+d.toLocaleDateString("pt-BR",{weekday:"long",day:"numeric",month:"long"})+".";
+const box=document.getElementById("hojeAcao");
+if(id){
+const t=TREINOS[id];
+document.getElementById("hojeTitulo").textContent=label+" — "+t.nome;
+document.getElementById("hojeDesc").textContent=t.desc+" Tempo: "+t.tempo+".";
+box.innerHTML='<button class="big" onclick="abrirTreino(\''+id+'\')">Começar o treino de hoje</button>';
+}else if(d.getDay()===3){
+document.getElementById("hojeTitulo").textContent=label;
+document.getElementById("hojeDesc").textContent="Dia de respirar. Se chegar em casa com energia, faz a corda leve de 10 min. Se estiver cansado, descansa — amanhã tem treino.";
+box.innerHTML='<button class="big" onclick="abrirCorda(\'leve\')">Corda leve — 10 min</button><button class="sec" onclick="abrirTreino(\'E\')">Só alongar (10 min)</button>';
+}else{
+document.getElementById("hojeTitulo").textContent=label;
+document.getElementById("hojeDesc").textContent="Fim de semana é dia de corda. Faz o treino de 20 min de manhã, com calma.";
+box.innerHTML='<button class="big" onclick="abrirCorda(\'longo\')">Corda fim de semana — 20 min</button>';
+}
+}
+
+// ---------- TREINOS ----------
+let treinoAtual=null, feitos=new Set(), timerInt=null, timerRest=0;
+function renderTreinos(){
+const el=document.getElementById("listaTreinos");
+el.innerHTML=Object.entries(TREINOS).map(([id,t])=>
+'<div class="card"><h3>'+t.nome+'</h3><p class="muted">'+t.desc+' • '+t.tempo+'</p><p>'+t.ex.map(e=>EX[e[0]].nome).join(" • ")+'</p><button class="sec" onclick="abrirTreino(\''+id+'\')">Abrir treino</button></div>').join("");
+}
+function abrirTreino(id){
+treinoAtual=id; feitos=new Set();
+show("treinos",document.querySelector('nav button[data-sec="treinos"]'));
+const t=TREINOS[id];
+const el=document.getElementById("treinoAberto");
+el.innerHTML='<div class="card"><h2>'+t.nome+'</h2><p class="muted">'+t.desc+' • '+t.tempo+' • Nível: '+state.nivel+'</p>'
++'<div class="bar"><i id="barTreino" style="width:0%"></i></div><p class="muted" id="txtTreino">0 de '+t.ex.length+' exercícios marcados</p>'
++t.ex.map((e,i)=>{
+const x=EX[e[0]]; const isTempo=/tempo/.test(e[1]);
+const dose=isTempo? repsTxt(e[2])+" s" : repsTxt(e[2])+" repetições";
+return '<div class="card" id="ex-'+i+'"><label class="ex"><input type="checkbox" onchange="marcar('+i+',this.checked)"><span class="body"><b>'+x.nome+'</b> — <span class="reps">'+e[1]+': '+dose+'</span><br>'+videoHTML(x,e[0])+'<span class="muted">'+x.como+'</span><br><span class="muted">Erro comum: '+x.erro+'</span><br><span class="muted">Mais fácil: '+x.facil+' • Mais difícil: '+x.dificil+'</span></span></label>'
++(isTempo?'<button class="sec" onclick="iniciarTimer('+repsTxt(e[2])+',\''+x.nome.replace(/'/g,"")+'\')">Iniciar '+repsTxt(e[2])+' s</button>':"")
++'</div>';}).join("")
++'<div class="card"><div class="timer-label" id="timerLabel">Descanso</div><div class="timer" id="timerShow">01:00</div>'
++'<button class="sec" onclick="iniciarTimer(60,\'Descanso\')">Descanso 60 s</button>'
++'<button class="sec" onclick="iniciarTimer(90,\'Descanso\')">Descanso 90 s</button>'
++'<button class="sec" onclick="pararTimer()">Parar</button></div>'
++'<button class="big" onclick="concluirTreino()">Concluir treino</button></div>';
+el.scrollIntoView({behavior:"smooth"});
+}
+function marcar(i,ok){if(ok)feitos.add(i);else feitos.delete(i);
+const t=TREINOS[treinoAtual]; const n=feitos.size;
+document.getElementById("barTreino").style.width=(n/t.ex.length*100)+"%";
+document.getElementById("txtTreino").textContent=n+" de "+t.ex.length+" exercícios marcados";
+const card=document.getElementById("ex-"+i); if(card) card.classList.toggle("done",ok);
+}
+function concluirTreino(){
+if(!treinoAtual) return;
+const t=TREINOS[treinoAtual];
+state.hist.push({data:new Date().toISOString().slice(0,10),nome:t.nome,min:parseInt(t.tempo.replace(/\D/g,""))||20});
+save(); alert("Treino concluído. 1% hoje, Marcus. Amanhã tem mais.");
+document.getElementById("treinoAberto").innerHTML=""; treinoAtual=null; renderProgresso();
+}
+
+// ---------- TIMER ----------
+function iniciarTimer(seg,label){
+pararTimer(); timerRest=seg;
+document.getElementById("timerLabel").textContent=label;
+const showEl=document.getElementById("timerShow");
+if(showEl) showEl.textContent=fmt(seg);
+timerInt=setInterval(()=>{
+timerRest--;
+if(showEl) showEl.textContent=fmt(timerRest);
+if(timerRest<=0){pararTimer(); beep(); if(showEl) showEl.textContent="00:00"; document.getElementById("timerLabel").textContent="Tempo! Descansa e vai para o próximo.";}
+},1000);
+}
+function pararTimer(){if(timerInt){clearInterval(timerInt); timerInt=null;}}
+
+// ---------- CORDA ----------
+let cordaAtual=null, cordaIdx=0, cordaRest=0, cordaInt=null;
+function renderCorda(){
+document.getElementById("listaCorda").innerHTML=Object.entries(CORDA).map(([id,c])=>
+'<div class="card"><h3>'+c.nome+'</h3><p class="muted">'+c.quando+' • '+c.tempo+'</p><p>'+c.desc+'</p><button class="sec" onclick="abrirCorda(\''+id+'\')">Abrir treino de corda</button></div>').join("");
+}
+function abrirCorda(id){
+cordaAtual=id; cordaIdx=0;
+show("corda",document.querySelector('nav button[data-sec="corda"]'));
+const c=CORDA[id];
+const el=document.getElementById("cordaAberta");
+el.innerHTML='<div class="card"><h2>'+c.nome+'</h2><p class="muted">'+c.quando+' • '+c.tempo+'</p>'
++'<div class="timer-label" id="cordaPasso">Pronto?</div><div class="timer" id="cordaTimer">--:--</div>'
++'<p class="muted" id="cordaDetalhe">Toca em começar. O timer troca de passo sozinho.</p>'
++'<button class="big" onclick="cordaComecar()">Começar corda</button> '
++'<button class="sec" onclick="cordaPausar()">Pausar</button> '
++'<button class="sec" onclick="cordaProximo()">Próximo passo</button> '
++'<button class="sec" onclick="cordaConcluir()">Concluir</button>'
++'<h3>Passos</h3>'+c.passos.map((p,i)=>'<p>'+(i+1)+'. <b>'+p[0]+'</b> — '+fmt(p[1])+(p[2]?' — '+p[2]:"")+'</p>').join("")+'</div>';
+el.scrollIntoView({behavior:"smooth"});
+}
+function cordaComecar(){cordaIdx=0; cordaPasso();}
+function cordaPasso(){
+const c=CORDA[cordaAtual]; if(!cordaAtual||cordaIdx>=c.passos.length){cordaConcluir(); return;}
+const p=c.passos[cordaIdx];
+document.getElementById("cordaPasso").textContent="Passo "+(cordaIdx+1)+" de "+c.passos.length+" — "+p[0];
+document.getElementById("cordaDetalhe").textContent=p[2]||"";
+cordaRest=p[1]; document.getElementById("cordaTimer").textContent=fmt(cordaRest);
+if(cordaInt) clearInterval(cordaInt);
+cordaInt=setInterval(()=>{
+cordaRest--; document.getElementById("cordaTimer").textContent=fmt(cordaRest);
+if(cordaRest<=0){clearInterval(cordaInt); beep(); cordaIdx++; cordaPasso();}
+},1000);
+}
+function cordaPausar(){if(cordaInt){clearInterval(cordaInt); cordaInt=null; document.getElementById("cordaPasso").textContent="Pausado — toca em Começar para recomeçar do passo atual.";}}
+function cordaProximo(){if(cordaInt) clearInterval(cordaInt); cordaIdx++; cordaPasso();}
+function cordaConcluir(){
+if(cordaInt) clearInterval(cordaInt);
+if(cordaAtual){const c=CORDA[cordaAtual]; state.hist.push({data:new Date().toISOString().slice(0,10),nome:c.nome,min:parseInt(c.tempo)||15}); save();}
+alert("Corda feita. Boa."); cordaAtual=null; document.getElementById("cordaAberta").innerHTML=""; renderProgresso();
+}
+
+// ---------- EXERCÍCIOS ----------
+function renderEx(){
+document.getElementById("listaEx").innerHTML=Object.entries(EX).map(([k,x])=>
+'<details><summary>'+x.nome+' <span class="tag soft">'+x.musculo+'</span></summary>'+videoHTML(x,k)+'<p>'+x.como+'</p><p class="muted">Erro comum: '+x.erro+'</p><p class="muted">Mais fácil: '+x.facil+'<br>Mais difícil: '+x.dificil+'</p></details>').join("");
+}
+function filtrarEx(){
+const q=(document.getElementById("q").value||"").toLowerCase();
+const m=document.getElementById("filtroMusculo").value;
+document.querySelectorAll("#listaEx details").forEach(d=>{
+const txt=d.textContent.toLowerCase();
+d.style.display=(!q||txt.includes(q))&&(!m||txt.includes(m.toLowerCase()))?"":"none";
+});
+}
+
+// ---------- PROGRESSO ----------
+function semanaISO(d){const t=new Date(d); t.setHours(0,0,0,0); t.setDate(t.getDate()+3-((t.getDay()+6)%7)); const s=new Date(t.getFullYear(),0,4); return t.getFullYear()+"-W"+(1+Math.round(((t-s)/86400000-3+((s.getDay()+6)%7))/7));}
+function renderProgresso(){
+const hoje=new Date(); const wk=semanaISO(hoje);
+const estaSemana=state.hist.filter(h=>semanaISO(new Date(h.data+"T12:00:00"))===wk);
+const totalMin=state.hist.reduce((a,h)=>a+(h.min||20),0);
+const porSemana={}; state.hist.forEach(h=>{const w=semanaISO(new Date(h.data+"T12:00:00")); porSemana[w]=(porSemana[w]||0)+1;});
+const boas=Object.values(porSemana).filter(n=>n>=3).length;
+document.getElementById("stTotal").textContent=state.hist.length;
+document.getElementById("stSemana").textContent=estaSemana.length;
+document.getElementById("stMin").textContent=totalMin;
+document.getElementById("stSeq").textContent=boas;
+document.getElementById("barSemana").style.width=Math.min(100,estaSemana.length/3*100)+"%";
+document.getElementById("metaTexto").textContent=estaSemana.length>=3?"Meta da semana batida. Mantém o ritmo.":("Faltam "+(3-estaSemana.length)+" treino(s) para bater a meta desta semana.");
+document.getElementById("historico").innerHTML=state.hist.length?state.hist.slice(-14).reverse().map(h=>'<div class="card"><b>'+h.nome+'</b><br><span class="muted">'+new Date(h.data+"T12:00:00").toLocaleDateString("pt-BR")+' • '+(h.min||20)+' min</span></div>').join(""):'<p class="muted">Nenhum treino registrado ainda. Faz o treino de hoje e marca como concluído aqui no app.</p>';
+}
+function limparHistorico(){if(confirm("Apagar todo o histórico?")){state.hist=[]; save(); renderProgresso();}}
+
+
+// ---------- CRONÔMETRO ----------
+let cronInt=null, cronRest=30, cronFaseAtual="ex", cronVoltaAtual=0, cronTotalVoltas=4;
+function cronMostrar(){document.getElementById("cronShow").textContent=fmt(cronRest);}
+function cronUnico(seg,label){cronParar(); cronFaseAtual="unico"; document.getElementById("cronFase").textContent=label; document.getElementById("cronVolta").textContent="Tempo único"; cronRest=seg; cronMostrar(); cronInt=setInterval(()=>{cronRest--; cronMostrar(); if(cronRest<=0){cronParar(); beep(); document.getElementById("cronFase").textContent="Tempo!";}},1000);}
+function cronIniciar(){
+cronParar();
+cronTotalVoltas=parseInt(document.getElementById("cronVoltas").value);
+cronVoltaAtual=1; cronFaseAtual="ex";
+cronRest=parseInt(document.getElementById("cronEx").value);
+document.getElementById("cronFase").textContent="Exercício — volta "+cronVoltaAtual;
+document.getElementById("cronVolta").textContent="Volta "+cronVoltaAtual+" de "+cronTotalVoltas;
+cronMostrar();
+cronInt=setInterval(()=>{
+cronRest--; cronMostrar();
+if(cronRest>0) return;
+beep();
+if(cronFaseAtual==="ex"){
+cronFaseAtual="desc"; cronRest=parseInt(document.getElementById("cronDesc").value);
+document.getElementById("cronFase").textContent="Descanso — respira";
+} else {
+if(cronVoltaAtual>=cronTotalVoltas){cronParar(); document.getElementById("cronFase").textContent="Fim! Bom trabalho."; return;}
+cronVoltaAtual++; cronFaseAtual="ex"; cronRest=parseInt(document.getElementById("cronEx").value);
+document.getElementById("cronFase").textContent="Exercício — volta "+cronVoltaAtual;
+document.getElementById("cronVolta").textContent="Volta "+cronVoltaAtual+" de "+cronTotalVoltas;
+}
+cronMostrar();
+},1000);
+}
+function cronPausar(){if(cronInt){clearInterval(cronInt); cronInt=null; document.getElementById("cronFase").textContent="Pausado";}}
+function cronParar(){if(cronInt){clearInterval(cronInt); cronInt=null;}}
+
+// ---------- INÍCIO ----------
+pintarNivel(); renderHoje(); renderTreinos(); renderCorda(); renderEx(); renderProgresso();
+</script>
+</body>
+</html>
